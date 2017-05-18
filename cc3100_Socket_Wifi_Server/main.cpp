@@ -22,7 +22,10 @@ using namespace mbed_cc3100;
 
 cc3100 _cc3100(p9, p10, p8, SPI(p11, p12, p13));//LPC1768  irq, nHib, cs, mosi, miso, sck
 Serial pc(USBTX, USBRX);//lpc1768
-DigitalOut myled(LED1);
+DigitalOut myled1(LED1);
+DigitalOut myled2(LED2);
+DigitalOut myled3(LED3);
+DigitalOut myled4(LED4);
 
 
 //GLOBAL VARIABLES -- Start
@@ -36,7 +39,8 @@ static void displayBanner()
      printf("***********Getting started with station application***********");
      printf("\n\r*******************************************************************************\n\r");
 }
- 
+
+
 //******************************STATION_MODE***********************************************
 //*****************************************************************************************
 void station_app()
@@ -74,6 +78,37 @@ void station_app()
 }
 //****************************END_STATION_MODE*********************************************
 //*****************************************************************************************
+void led(int result){
+    
+    if (result > 0)
+      { 
+            myled1 = 1;
+            wait(0.05);
+            myled1 = 0;
+            wait(0.05);
+                    myled2 = 1;
+            wait(0.05);
+            myled2 = 0;
+            wait(0.05);
+                    myled3 = 1;
+            wait(0.05);
+            myled3 = 0;
+            wait(0.05);
+                    myled4 = 1;
+            wait(0.05);
+            myled4 = 0;
+            wait(0.05);
+        }
+    else 
+    { myled1 = 0;
+      myled2 = 0;
+      myled3 = 0;
+      myled4 = 0;
+    }
+
+ }
+
+
 
 static int32_t BsdTcpServer(uint16_t Port)
 {
@@ -88,12 +123,14 @@ static int32_t BsdTcpServer(uint16_t Port)
     int16_t          LoopCount = 0;
     //int16_t          SlSockAddrIn_t = 0;
     int16_t          recvSize = 0;
+       
 /*
     for (idx=0 ; idx<BUF_SIZE ; idx++)
     {
         uBuf.BsdBuf[idx] = (_u8)(idx % 10);
     }
 */
+
     LocalAddr.sin_family = SL_AF_INET;
     LocalAddr.sin_port = _cc3100._socket.sl_Htons(PORT_NUM);
     LocalAddr.sin_addr.s_addr = 0;
@@ -103,11 +140,11 @@ static int32_t BsdTcpServer(uint16_t Port)
         SockID = _cc3100._socket.sl_Socket(SL_AF_INET,SL_SOCK_STREAM, 0);
         if( SockID < 0 )
         {
-            printf(" [TCP Server] Create socket Error \n\r");
+            printf(" \n[TCP Server] Create socket Error \n\r");
             ASSERT_ON_ERROR(SockID);
         }
         else 
-            printf("Create socket \n\r");
+            printf("\nCreate socket \n\r");
         
     
         AddrSize = sizeof(SlSockAddrIn_t);
@@ -115,77 +152,77 @@ static int32_t BsdTcpServer(uint16_t Port)
         if( Status < 0 )
         {
             _cc3100._socket.sl_Close(SockID);
-            printf(" [TCP Server] Socket address assignment Error \n\r");
+            printf(" \n[TCP Server] Socket address assignment Error \n\r");
             ASSERT_ON_ERROR(Status);
         }
         else
-            printf("Socket address assignment \n\r");
+            printf("\nSocket address assignment \n\r");
     
         Status = _cc3100._socket.sl_Listen(SockID, 0);
         if( Status < 0 )
         {
             _cc3100._socket.sl_Close(SockID);
-            printf(" [TCP Server] Listen Error \n\r");
+            printf("\n [TCP Server] Listen Error \n\r");
             ASSERT_ON_ERROR(Status);
         }
         else
-            printf("Listen OK \n\r");
+            printf("\nListen for a Connection \n\r");
     
         newSockID = _cc3100._socket.sl_Accept(SockID, (SlSockAddr_t *)&Addr,(SlSocklen_t*)&AddrSize);
         if( newSockID < 0 )
         {
             _cc3100._socket.sl_Close(SockID);
-            printf(" [TCP Server] Accept connection Error \n\r");
+            printf("\n [TCP Server] Accept connection Error \n\r");
             ASSERT_ON_ERROR(newSockID);
         }
         else 
-            printf("Accept connection \n\r");
+            printf("\nAccept connection \n\r");
 
-        
-        while (LoopCount < NO_OF_PACKETS)
-        {
-            
-            //printf("While \n\r");
+    while (LoopCount < NO_OF_PACKETS)
+        {   
+            //TODO : sarebbe da chiamare la funzione led() con un altro thread così da farla girare in background
+            led(1);
             recvSize = BUF_SIZE;
             //printf("RecvSize = %d \n\r",recvSize);
             do
             {
-                
-                //printf("DO \n\r");
-                //printf("RecvSize1 = %d \n\r",recvSize);
                 Status = _cc3100._socket.sl_Recv(newSockID, &(stringa), strlen(stringa), 0);
-                //printf("RecvSize2 = %d \n\r",recvSize);
                 if( Status <= 0 )
                 {
                     _cc3100._socket.sl_Close(newSockID);
                     _cc3100._socket.sl_Close(SockID);
-                    printf(" [TCP Server] Data recv Error \n\r");
+                    led(1);
+                    printf(" \n[TCP Server] Data recv Error. Close socket %d \n\n\r",SockID);
                     //ASSERT_ON_ERROR(TCP_RECV_ERROR);
                     
                     /*-----Accept new connection----------*/
                     SockID = _cc3100._socket.sl_Socket(SL_AF_INET,SL_SOCK_STREAM, 0);
-                    printf("----------Create new socket---------- \n\r");
+                    printf("----------Create new socket---------- \n\n\r");
                     AddrSize = sizeof(SlSockAddrIn_t);
                     Status = _cc3100._socket.sl_Bind(SockID, (SlSockAddr_t *)&LocalAddr, AddrSize);
-                    printf("----------Socket address assignment---------- \n\r");
+                    printf("----------Socket address assignment---------- \n\n\r");
                     Status = _cc3100._socket.sl_Listen(SockID, 0);
-                    printf("----------Listen OK---------- \n\r");
+                    printf("----------Listen for a new Connection---------- \n\n\r");
                     newSockID = _cc3100._socket.sl_Accept(SockID, (SlSockAddr_t *)&Addr,(SlSocklen_t*)&AddrSize);
-                    printf("----------Accept new connection---------- \n\r");
-                    char stringa[100];
-       
+                    printf("----------Accept new connection---------- \n\n\r");
+                    led(1);
                 }
                 
                 //printf("Status = %d \n\r",Status);
                 recvSize -= Status;
                 //printf("RecvSize = %d \n\r",recvSize);
                 printf("%s",stringa);
+                led(1);
+                char thanks [] = "Data received";
+                _cc3100._socket.sl_Send(SockID, &(thanks), strlen(thanks), 0);
                 
             }
             while(recvSize > 0);
     
             LoopCount++;
         }
+        
+
     
     Status = _cc3100._socket.sl_Close(newSockID);
     ASSERT_ON_ERROR(Status);
@@ -194,10 +231,8 @@ static int32_t BsdTcpServer(uint16_t Port)
     ASSERT_ON_ERROR(Status);
 
     return SUCCESS;
+    
 }
-
-
-
 
 
 
@@ -267,3 +302,4 @@ int main(void)
     
     
 }    
+
