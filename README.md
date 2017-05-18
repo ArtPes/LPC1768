@@ -2,9 +2,12 @@
 
 ###### Ethernet : 
             - TCPSocket_HelloWorld_lpcxpresso_lpc1768
-            - connette tramite ethernet e scarica da sito stringhe.
+            - connect with ethernet and download from specific site.
 ###### Wifi :
             Server : 
                     - cc3100_Socket_Wifi_Server_lpcxpresso_lpc1768
-                    - si mette in ascolto su porta 50001 di connessione TCP.
-                    - TODO: impostare SSID e pass dell'Access Point a cui ci si connette.
+                    - listen on port 50001 with TCP.
+                    - TODO: set SSID and password of Access Point to connect mbed.
+            Client : 
+                    - 
+                    -send msg to server and wait ack of response
