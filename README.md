@@ -15,6 +15,5 @@
             informzaioni necessarie al funzionamento dei vari progetti. Le immagini utilizzate
             sono state raccolte nel folder images nel caso sia necessario ingrandirle uteriormente.
             
-##### Al seguente [link](https://developer.mbed.org/users/artpes/code/) è possibile accedere ai progetti così da poter importarli 
-#####  nel compilatore online messo a disposizione dal sito mbed.org
+##### Al seguente [link](https://developer.mbed.org/users/artpes/code/) è possibile accedere ai progetti così da poter importarli nel compilatore online messo a disposizione dal sito mbed.org
 
